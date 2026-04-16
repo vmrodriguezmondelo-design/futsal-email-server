@@ -210,6 +210,44 @@ app.post('/upload-shield', async (req, res) => {
   }
 });
 
+// Generate authorization email HTML
+const generateAuthorizationEmailHTML = (parentName, childName, formType = 'Autorización', clubName = 'FUTSAL PRO', clubShield = null) => {
+  return `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+      <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 40px; text-align: center; border-radius: 10px 10px 0 0;">
+        <h1 style="color: white; margin: 0; font-size: 28px;">${clubName}</h1>
+        <p style="color: rgba(255,255,255,0.9); margin: 5px 0 0 0;">Portal de Padres</p>
+      </div>
+
+      <div style="background: #f8f9fa; padding: 40px; border-radius: 0 0 10px 10px;">
+        <p style="color: #1f2937; font-size: 16px; margin: 0 0 20px 0;">
+          Hola ${parentName},
+        </p>
+
+        <p style="color: #4b5563; font-size: 15px; margin: 0 0 30px 0;">
+          Se requiere tu firma en un formulario de ${formType} para <strong>${childName}</strong>.
+        </p>
+
+        <div style="background: white; padding: 20px; border-radius: 8px; text-align: center; margin: 30px 0; border-left: 4px solid #10b981;">
+          <p style="color: #1f2937; font-size: 14px; margin: 0;">
+            Por favor, accede a tu cuenta en el portal para revisar y firmar el formulario.
+          </p>
+        </div>
+
+        <p style="color: #4b5563; font-size: 14px; margin: 30px 0 0 0;">
+          La firma es obligatoria para continuar.
+        </p>
+
+        <div style="border-top: 1px solid #e5e7eb; margin-top: 30px; padding-top: 20px; text-align: center;">
+          <p style="color: #9ca3af; font-size: 12px; margin: 0;">
+            © 2026 ${clubName} - Gestión Integral de Prendas
+          </p>
+        </div>
+      </div>
+    </div>
+  `;
+};
+
 // Send authorization email endpoint
 app.post('/send-authorization-email', async (req, res) => {
   try {
@@ -222,9 +260,7 @@ app.post('/send-authorization-email', async (req, res) => {
       });
     }
 
-    // Import template function
-    const { generateAuthorizationEmail } = await import('../src/services/emailTemplates.js');
-    const htmlContent = generateAuthorizationEmail(parentName, childName, formType, clubName || 'FUTSAL PRO', clubShield);
+    const htmlContent = generateAuthorizationEmailHTML(parentName, childName, formType, clubName || 'FUTSAL PRO', clubShield);
 
     const mailOptions = {
       from: SMTP_FROM,
@@ -250,6 +286,44 @@ app.post('/send-authorization-email', async (req, res) => {
   }
 });
 
+// Generate size change email HTML
+const generateSizeChangeEmailHTML = (parentName, childName, itemName, oldSize, newSize, clubName = 'FUTSAL PRO', clubShield = null) => {
+  return `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+      <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 40px; text-align: center; border-radius: 10px 10px 0 0;">
+        <h1 style="color: white; margin: 0; font-size: 28px;">${clubName}</h1>
+        <p style="color: rgba(255,255,255,0.9); margin: 5px 0 0 0;">Portal de Padres</p>
+      </div>
+
+      <div style="background: #f8f9fa; padding: 40px; border-radius: 0 0 10px 10px;">
+        <p style="color: #1f2937; font-size: 16px; margin: 0 0 20px 0;">
+          Hola ${parentName},
+        </p>
+
+        <p style="color: #4b5563; font-size: 15px; margin: 0 0 30px 0;">
+          Te informamos que la solicitud de cambio de talla para <strong>${childName}</strong> ha sido aprobada.
+        </p>
+
+        <div style="background: white; padding: 20px; border-radius: 8px; text-align: center; margin: 30px 0; border-left: 4px solid #10b981;">
+          <p style="color: #1f2937; font-size: 14px; margin: 0 0 10px 0;">Prenda: <strong>${itemName}</strong></p>
+          <p style="color: #4b5563; font-size: 14px; margin: 0 0 10px 0;">Talla anterior: <strong>${oldSize}</strong></p>
+          <p style="color: #10b981; font-size: 18px; font-weight: bold; margin: 10px 0;">Nueva talla: <strong>${newSize}</strong></p>
+        </div>
+
+        <p style="color: #4b5563; font-size: 14px; margin: 30px 0 0 0;">
+          Por favor, recoge la prenda en la próxima convocatoria.
+        </p>
+
+        <div style="border-top: 1px solid #e5e7eb; margin-top: 30px; padding-top: 20px; text-align: center;">
+          <p style="color: #9ca3af; font-size: 12px; margin: 0;">
+            © 2026 ${clubName} - Gestión Integral de Prendas
+          </p>
+        </div>
+      </div>
+    </div>
+  `;
+};
+
 // Send size change email endpoint
 app.post('/send-size-change-email', async (req, res) => {
   try {
@@ -262,9 +336,7 @@ app.post('/send-size-change-email', async (req, res) => {
       });
     }
 
-    // Import template function
-    const { generateSizeChangeEmail } = await import('../src/services/emailTemplates.js');
-    const htmlContent = generateSizeChangeEmail(parentName, childName, itemName, oldSize, newSize, clubName || 'FUTSAL PRO', clubShield);
+    const htmlContent = generateSizeChangeEmailHTML(parentName, childName, itemName, oldSize, newSize, clubName || 'FUTSAL PRO', clubShield);
 
     const mailOptions = {
       from: SMTP_FROM,
@@ -291,6 +363,43 @@ app.post('/send-size-change-email', async (req, res) => {
 });
 
 // Send damage report email endpoint
+// Generate damage report email HTML
+const generateDamageReportEmailHTML = (parentName, childName, itemName, damageType = 'Daño', clubName = 'FUTSAL PRO', clubShield = null) => {
+  return `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+      <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 40px; text-align: center; border-radius: 10px 10px 0 0;">
+        <h1 style="color: white; margin: 0; font-size: 28px;">${clubName}</h1>
+        <p style="color: rgba(255,255,255,0.9); margin: 5px 0 0 0;">Portal de Padres</p>
+      </div>
+
+      <div style="background: #f8f9fa; padding: 40px; border-radius: 0 0 10px 10px;">
+        <p style="color: #1f2937; font-size: 16px; margin: 0 0 20px 0;">
+          Hola ${parentName},
+        </p>
+
+        <p style="color: #4b5563; font-size: 15px; margin: 0 0 30px 0;">
+          Hemos recibido tu reporte de daño en una prenda.
+        </p>
+
+        <div style="background: white; padding: 20px; border-radius: 8px; text-align: center; margin: 30px 0; border-left: 4px solid #ff9500;">
+          <p style="color: #1f2937; font-size: 14px; margin: 0 0 10px 0;">Prenda: <strong>${itemName}</strong></p>
+          <p style="color: #ff9500; font-size: 14px; margin: 0;">Tipo de daño: <strong>${damageType}</strong></p>
+        </div>
+
+        <p style="color: #4b5563; font-size: 14px; margin: 30px 0 0 0;">
+          Nuestro equipo revisará tu reporte en breve y te notificará del resultado.
+        </p>
+
+        <div style="border-top: 1px solid #e5e7eb; margin-top: 30px; padding-top: 20px; text-align: center;">
+          <p style="color: #9ca3af; font-size: 12px; margin: 0;">
+            © 2026 ${clubName} - Gestión Integral de Prendas
+          </p>
+        </div>
+      </div>
+    </div>
+  `;
+};
+
 app.post('/send-damage-report-email', async (req, res) => {
   try {
     const { email, parentName, childName, itemName, damageType, clubName, clubShield } = req.body;
@@ -302,9 +411,7 @@ app.post('/send-damage-report-email', async (req, res) => {
       });
     }
 
-    // Import template function
-    const { generateDamageReportEmail } = await import('../src/services/emailTemplates.js');
-    const htmlContent = generateDamageReportEmail(parentName, childName, itemName, damageType, clubName || 'FUTSAL PRO', clubShield);
+    const htmlContent = generateDamageReportEmailHTML(parentName, childName, itemName, damageType, clubName || 'FUTSAL PRO', clubShield);
 
     const mailOptions = {
       from: SMTP_FROM,
